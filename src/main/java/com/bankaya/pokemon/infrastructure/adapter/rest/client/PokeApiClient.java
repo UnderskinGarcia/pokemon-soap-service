@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.bankaya.pokemon.domain.exception.BadRequestException;
 import com.bankaya.pokemon.domain.exception.PokemonNotFoundException;
 import com.bankaya.pokemon.domain.exception.PokemonServiceException;
 import com.bankaya.pokemon.domain.model.Pokemon;
@@ -34,6 +35,10 @@ public class PokeApiClient implements PokemonApiPort {
 
     @Override
     public Pokemon fetchPokemonByName(String pokemonName) {
+        if (pokemonName == null || pokemonName.trim().isEmpty()) {
+            throw new BadRequestException("Pokemon name cannot be null or empty");
+        }
+
         log.info("Fetching Pokemon from PokeAPI: {}", pokemonName);
 
         try {
@@ -42,7 +47,8 @@ public class PokeApiClient implements PokemonApiPort {
                     .uri(pokeApiBaseUrl + "/pokemon/{name}", pokemonName.toLowerCase())
                     .retrieve()
                     .onStatus(HttpStatus.NOT_FOUND::equals,
-                            clientResponse -> Mono.error(new PokemonNotFoundException(pokemonName)))
+                            clientResponse -> Mono.error(new PokemonNotFoundException(pokemonName))
+                    )
                     .bodyToMono(PokemonApiResponse.class)
                     .block();
 
