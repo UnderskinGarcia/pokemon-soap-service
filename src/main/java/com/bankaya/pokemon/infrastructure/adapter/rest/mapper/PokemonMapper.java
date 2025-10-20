@@ -1,11 +1,11 @@
 package com.bankaya.pokemon.infrastructure.adapter.rest.mapper;
 
-import com.bankaya.pokemon.domain.model.Pokemon;
-import com.bankaya.pokemon.infrastructure.adapter.rest.dto.PokemonApiResponse;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import com.bankaya.pokemon.domain.model.Pokemon;
+import com.bankaya.pokemon.infrastructure.adapter.rest.dto.PokemonApiResponse;
 
 /**
  * MapStruct Mapper for Pokemon

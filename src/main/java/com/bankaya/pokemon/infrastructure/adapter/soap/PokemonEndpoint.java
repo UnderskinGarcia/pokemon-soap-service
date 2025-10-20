@@ -6,15 +6,12 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.bankaya.pokemon.application.service.PokemonService;
-import com.bankaya.pokemon.domain.model.Pokemon;
-import com.bankaya.pokemon.soap.Ability;
 import com.bankaya.pokemon.soap.GetPokemonAbilitiesResponse;
 import com.bankaya.pokemon.soap.GetPokemonBaseExperienceResponse;
 import com.bankaya.pokemon.soap.GetPokemonHeldItemsResponse;
 import com.bankaya.pokemon.soap.GetPokemonIdResponse;
 import com.bankaya.pokemon.soap.GetPokemonLocationAreaEncountersResponse;
 import com.bankaya.pokemon.soap.GetPokemonNameResponse;
-import com.bankaya.pokemon.soap.HeldItem;
 import com.bankaya.pokemon.soap.PokemonNameRequest;
 
 import lombok.RequiredArgsConstructor;
