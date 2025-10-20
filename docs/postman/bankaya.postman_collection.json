@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "1259fc6b-c439-4f8a-a6e1-0ed5a600ee27",
+		"name": "bankaya",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "680858"
+	},
+	"item": [
+		{
+			"name": "Actuator",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "utf-8",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/actuator",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"actuator"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pokemon.wsdl",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws/pokemon.wsdl",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws",
+						"pokemon.wsdl"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonAbilities",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "utf-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonAbilitiesRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonAbilitiesRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonByName",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "utf-8",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/pikachu",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"pikachu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLocationArea",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonLocationAreaEncountersRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonLocationAreaEncountersRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonName",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonNameRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonNameRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonId",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonIdRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonIdRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonHeldItems",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonHeldItemsRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonHeldItemsRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetPokemonBaseExperience",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\r\n                    xmlns:soap=\"http://bankaya.com/pokemon/soap\">\r\n    <soapenv:Header/>\r\n    <soapenv:Body>\r\n        <soap:GetPokemonBaseExperienceRequest>\r\n            <soap:name>pikachu</soap:name>\r\n        </soap:GetPokemonBaseExperienceRequest>\r\n    </soapenv:Body>\r\n</soapenv:Envelope>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/pokemon/ws",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"pokemon",
+						"ws"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
