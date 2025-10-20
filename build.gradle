@@ -42,25 +42,31 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
     testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.ws:spring-ws-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // JAXB para SOAP
-    implementation 'com.sun.xml.bind:jaxb-impl:4.0.4'
+    implementation 'com.sun.xml.bind:jaxb-impl:4.0.6'
     implementation 'wsdl4j:wsdl4j:1.6.3'
 
     // MapStruct
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
+    jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }.absolutePath}"
 }
 
-tasks.named('bootJar') {
+bootJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
