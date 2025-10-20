@@ -104,11 +104,11 @@ class PokemonEndpointIntegrationTest {
 
     @ParameterizedTest(name = "{0} with {1} should return SOAP fault")
     @CsvSource({
-            "GetPokemonNameRequest, nonexistentpokemon123456, Pokemon not found",
-            "GetPokemonNameRequest, '', Empty Pokemon name"
+            "GetPokemonNameRequest, nonexistentpokemon123456",
+            "GetPokemonNameRequest, ''"
     })
     @DisplayName("Should handle error cases with SOAP faults")
-    void testErrorCases(String requestType, String pokemonName, String testDescription) {
+    void testErrorCases(String requestType, String pokemonName) {
         // Given - SOAP request with invalid input
         String soapRequest = String.format("""
                 <%s xmlns="http://bankaya.com/pokemon/soap">
