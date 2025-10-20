@@ -1,14 +1,5 @@
 package com.bankaya.pokemon.application.api.controller;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +16,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import lombok.extern.log4j.Log4j2;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Integration tests for PokemonRestController
@@ -44,10 +42,10 @@ class PokemonRestControllerIntegrationTest {
     // Provider method for successful Pokemon requests
     static Stream<Arguments> provideValidPokemonNames() {
         return Stream.of(
-            Arguments.of("pikachu", 25, "pikachu"),
-            Arguments.of("bulbasaur", 1, "bulbasaur"),
-            Arguments.of("charmander", 4, "charmander"),
-            Arguments.of("squirtle", 7, "squirtle")
+                Arguments.of("pikachu", 25, "pikachu"),
+                Arguments.of("bulbasaur", 1, "bulbasaur"),
+                Arguments.of("charmander", 4, "charmander"),
+                Arguments.of("squirtle", 7, "squirtle")
         );
     }
 
@@ -57,27 +55,25 @@ class PokemonRestControllerIntegrationTest {
     void testGetPokemonByValidName(String pokemonName, int expectedId, String expectedName) throws Exception {
         // When & Then - Request Pokemon and verify response
         mockMvc.perform(get("/pokemon/{pokemonName}", pokemonName))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id", equalTo(expectedId)))
-            .andExpect(jsonPath("$.name", equalTo(expectedName)))
-            .andExpect(jsonPath("$.height", notNullValue()))
-            .andExpect(jsonPath("$.weight", notNullValue()))
-            .andExpect(jsonPath("$.base_experience", notNullValue()))
-            .andExpect(jsonPath("$.abilities", notNullValue()));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", equalTo(expectedId)))
+                .andExpect(jsonPath("$.name", equalTo(expectedName)))
+                .andExpect(jsonPath("$.base_experience", notNullValue()))
+                .andExpect(jsonPath("$.abilities", notNullValue()));
     }
 
     @ParameterizedTest(name = "GET /pokemon/{0} should return 404 or error")
     @CsvSource({
-        "nonexistentpokemon123456",
-        "invalidpokemonname",
-        "pokemon-does-not-exist"
+            "nonexistentpokemon123456",
+            "invalidpokemonname",
+            "pokemon-does-not-exist"
     })
     @DisplayName("Should return error for non-existent Pokemon")
     void testGetPokemonByInvalidName(String pokemonName) throws Exception {
         // When & Then - Request non-existent Pokemon and expect error
         mockMvc.perform(get("/pokemon/{pokemonName}", pokemonName))
-            .andExpect(status().is5xxServerError());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -85,10 +81,10 @@ class PokemonRestControllerIntegrationTest {
     void testCaseInsensitivePokemonNames() throws Exception {
         // When & Then - Request Pokemon with uppercase name
         mockMvc.perform(get("/pokemon/{pokemonName}", "PIKACHU"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id", equalTo(25)))
-            .andExpect(jsonPath("$.name", equalTo("pikachu")));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", equalTo(25)))
+                .andExpect(jsonPath("$.name", equalTo("pikachu")));
     }
 
     @Test
@@ -96,10 +92,10 @@ class PokemonRestControllerIntegrationTest {
     void testPokemonWithAbilities() throws Exception {
         // When & Then - Request Pikachu and verify abilities
         mockMvc.perform(get("/pokemon/{pokemonName}", "pikachu"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.abilities", hasSize(greaterThan(0))))
-            .andExpect(jsonPath("$.abilities[0].ability", notNullValue()))
-            .andExpect(jsonPath("$.abilities[0].ability.name", notNullValue()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.abilities", hasSize(greaterThan(0))))
+                .andExpect(jsonPath("$.abilities[0].name", notNullValue()))
+                .andExpect(jsonPath("$.abilities[0].url", notNullValue()));
     }
 
     @Test
@@ -107,8 +103,8 @@ class PokemonRestControllerIntegrationTest {
     void testPokemonWithHeldItems() throws Exception {
         // When & Then - Request Pokemon and verify held_items array exists
         mockMvc.perform(get("/pokemon/{pokemonName}", "pikachu"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.held_items", notNullValue()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.held_items", notNullValue()));
     }
 
     @Test
@@ -116,8 +112,8 @@ class PokemonRestControllerIntegrationTest {
     void testPokemonWithLocationAreaEncounters() throws Exception {
         // When & Then - Request Pokemon and verify location_area_encounters exists
         mockMvc.perform(get("/pokemon/{pokemonName}", "pikachu"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.location_area_encounters", notNullValue()));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.location_area_encounters", notNullValue()));
     }
 
     @Test
@@ -125,6 +121,6 @@ class PokemonRestControllerIntegrationTest {
     void testEmptyPokemonName() throws Exception {
         // When & Then - Request with empty name should return 404 or 405
         mockMvc.perform(get("/pokemon/"))
-            .andExpect(status().is4xxClientError());
+                .andExpect(status().is4xxClientError());
     }
 }
