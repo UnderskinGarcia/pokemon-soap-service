@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.github.bjornvester.xjc' version '1.8.2'
 }
 
 group = 'com.bankaya'
@@ -45,6 +46,10 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    // JAXB para SOAP
+    implementation 'com.sun.xml.bind:jaxb-impl:4.0.4'
+    implementation 'wsdl4j:wsdl4j:1.6.3'
+
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
@@ -58,3 +63,10 @@ tasks.named('test') {
 tasks.named('bootJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// JAXB Configuration - Generate classes from XSD
+xjc {
+    xsdDir = file("${projectDir}/src/main/resources/xsd")
+    outputJavaDir = layout.buildDirectory.dir("generated-sources/jaxb")
+}
+
