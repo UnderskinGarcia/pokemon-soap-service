@@ -161,15 +161,18 @@ cp .env.example .env
 Variables disponibles en `.env`:
 
 ```properties
+# Docker compose
+DOCKER_POSTGRES_PORTS=5432:5432
+DOCKER_APP_PORTS=8080:8080
+
 # PostgreSQL Configuration
 POSTGRES_DB=pokemondb
 POSTGRES_HOST=postgres                    # 'postgres' para Docker, 'localhost' para local
-POSTGRES_PORT=5432:5432                   # Puerto de PostgreSQL
+POSTGRES_PORT=5432                   # Puerto de PostgreSQL
 POSTGRES_USER=pokemon
 POSTGRES_PASSWORD=change_this_password    # Cambiar en producción
 
 # Application
-APP_PORT=8080:8080                        # Puerto de la aplicación
 SPRING_PROFILES_ACTIVE=default            # Perfil de Spring (default, dev, prod)
 ```
 
