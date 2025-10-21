@@ -4,11 +4,8 @@ import java.time.LocalDateTime;
 
 import com.bankaya.pokemon.infrastructure.adapter.enums.RequestStatus;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.With;
 
 /**

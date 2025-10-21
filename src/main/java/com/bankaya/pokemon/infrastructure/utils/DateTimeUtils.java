@@ -1,9 +1,7 @@
 package com.bankaya.pokemon.infrastructure.utils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
