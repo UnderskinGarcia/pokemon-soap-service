@@ -3,12 +3,14 @@ package com.bankaya.pokemon.domain.model;
 import java.util.List;
 
 import lombok.Builder;
+import lombok.With;
 
 /**
  * Pokémon Domain Entity - Core business model
  * This model represents the Pokémon in the domain layer (Hexagonal Architecture)
  */
 @Builder
+@With
 public record Pokemon(
         Long id,
         String name,
