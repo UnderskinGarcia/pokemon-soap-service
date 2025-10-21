@@ -18,6 +18,13 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+
+    // Excluir dependencias conflictivas
+    configureEach {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+    }
 }
 
 repositories {
@@ -25,26 +32,16 @@ repositories {
 }
 
 dependencies {
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
-    implementation('org.springframework.boot:spring-boot-starter-web-services') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
-    implementation('org.springframework.boot:spring-boot-starter-webflux') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
-    implementation('org.springframework.boot:spring-boot-starter-actuator') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.ws:spring-ws-test'
     testCompileOnly 'org.projectlombok:lombok'
@@ -59,12 +56,15 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // Caffeine Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 }
 
 test {
     useJUnitPlatform()
     jvmArgs(
-            "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }.absolutePath}",
             "-Xshare:off",  // Disable CDS to avoid warning with javaagent
             "-XX:+EnableDynamicAgentLoading"  // Suppress dynamic agent loading warning
     )

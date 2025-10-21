@@ -1,5 +1,7 @@
 package com.bankaya.pokemon.application.service;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.bankaya.pokemon.domain.model.Pokemon;
@@ -21,6 +23,10 @@ import lombok.extern.log4j.Log4j2;
  * Application Service - Pokemon Use Case Implementation
  * This service implements the business logic for Pokemon operations
  * Part of the Application layer in Hexagonal Architecture
+ * Caching Strategy:
+ * - Cache by Pokemon name (pokemonByName)
+ * - Cache by Pokemon ID (pokemonById)
+ * - TTL and eviction policies configured in CacheConfig
  */
 @Log4j2
 @Service
@@ -28,16 +34,22 @@ import lombok.extern.log4j.Log4j2;
 public class PokemonService implements GetPokemonUseCase {
 
     private final PokemonApiPort pokemonApiPort;
+    private final ApplicationContext applicationContext;
+
+    private GetPokemonUseCase getSelf(){
+        return applicationContext.getBean(GetPokemonUseCase.class);
+    }
 
     @Override
+    @Cacheable(value = "pokemonByName", key = "#pokemonName.toLowerCase()", unless = "#result == null")
     public Pokemon getPokemonByName(String pokemonName) {
-        log.info("Fetching Pokemon by name: {}", pokemonName);
+        log.info("Fetching Pokemon by name from API (cache miss): {}", pokemonName);
         return pokemonApiPort.fetchPokemonByName(pokemonName);
     }
 
     @Override
     public GetPokemonAbilitiesResponse getPokemonAbilities(String pokemonName) {
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonAbilitiesResponse response = new GetPokemonAbilitiesResponse();
 
@@ -55,7 +67,7 @@ public class PokemonService implements GetPokemonUseCase {
     }
 
     @Override public GetPokemonBaseExperienceResponse getPokemonBaseExperienceResponse(String pokemonName) {
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonBaseExperienceResponse response = new GetPokemonBaseExperienceResponse();
         response.setBaseExperience(pokemon.baseExperience());
@@ -65,7 +77,7 @@ public class PokemonService implements GetPokemonUseCase {
     @Override public GetPokemonHeldItemsResponse getPokemonHeldItems(String pokemonName) {
         log.info("SOAP Request - Get Pokemon Held Items: {}", pokemonName);
 
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonHeldItemsResponse response = new GetPokemonHeldItemsResponse();
 
@@ -85,7 +97,7 @@ public class PokemonService implements GetPokemonUseCase {
     public GetPokemonIdResponse getPokemonId(String pokemonName) {
         log.info("SOAP Request - Get Pokemon ID: {}", pokemonName);
 
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonIdResponse response = new GetPokemonIdResponse();
         response.setId(pokemon.id());
@@ -97,7 +109,7 @@ public class PokemonService implements GetPokemonUseCase {
     public GetPokemonNameResponse getPokemonName(String pokemonName) {
         log.info("SOAP Request - Get Pokemon Name: {}", pokemonName);
 
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonNameResponse response = new GetPokemonNameResponse();
         response.setName(pokemon.name());
@@ -109,7 +121,7 @@ public class PokemonService implements GetPokemonUseCase {
     public GetPokemonLocationAreaEncountersResponse getPokemonLocationAreaEncounters(String pokemonName) {
         log.info("SOAP Request - Get Pokemon Location Area Encounters: {}", pokemonName);
 
-        Pokemon pokemon = getPokemonByName(pokemonName);
+        Pokemon pokemon = getSelf().getPokemonByName(pokemonName);
 
         GetPokemonLocationAreaEncountersResponse response = new GetPokemonLocationAreaEncountersResponse();
         response.setLocationAreaEncounters(pokemon.locationAreaEncounters());
