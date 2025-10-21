@@ -1,6 +1,6 @@
 package com.bankaya.pokemon.infrastructure.adapter.persistence.repository;
 
-import com.bankaya.pokemon.infrastructure.adapter.persistence.entity.RequestLogEntity;
+import com.bankaya.pokemon.infrastructure.adapter.persistence.entity.SoapAuditLogEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  * Spring Data JPA repository interface
  */
 @Repository
-public interface JpaRequestLogRepository extends JpaRepository<RequestLogEntity, Long> {
+public interface JpaAuditLogRepository extends JpaRepository<SoapAuditLogEntity, Long> {
 }
