@@ -1,4 +1,4 @@
-package com.bankaya.pokemon.application.api.controller;
+package com.bankaya.pokemon.application.rest.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
