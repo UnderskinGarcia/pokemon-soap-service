@@ -102,21 +102,43 @@ class PokemonEndpointIntegrationTest {
         }
     }
 
-    @ParameterizedTest(name = "{0} with {1} should return SOAP fault")
+    @ParameterizedTest(name = "{0} with empty name should return CLIENT SOAP fault")
     @CsvSource({
-            "GetPokemonNameRequest, nonexistentpokemon123456",
-            "GetPokemonNameRequest, ''"
+            "GetPokemonNameRequest, ''",
+            "GetPokemonIdRequest, ''",
+            "GetPokemonAbilitiesRequest, ''"
     })
-    @DisplayName("Should handle error cases with SOAP faults")
-    void testErrorCases(String requestType, String pokemonName) {
-        // Given - SOAP request with invalid input
+    @DisplayName("Should handle bad request with CLIENT SOAP fault")
+    void testBadRequestErrors(String requestType, String pokemonName) {
+        // Given - SOAP request with invalid input (empty name)
         String soapRequest = String.format("""
                 <%s xmlns="http://bankaya.com/pokemon/soap">
                     <name>%s</name>
                 </%s>
                 """, requestType, pokemonName, requestType);
 
-        // When & Then - Send request and expect a SOAP fault
+        // When & Then - Send request and expect a CLIENT SOAP fault
+        mockClient
+                .sendRequest(RequestCreators.withPayload(new StringSource(soapRequest)))
+                .andExpect(ResponseMatchers.clientOrSenderFault());
+    }
+
+    @ParameterizedTest(name = "{0} with non-existent Pokemon should return SERVER SOAP fault")
+    @CsvSource({
+            "GetPokemonNameRequest, nonexistentpokemon123456",
+            "GetPokemonIdRequest, nonexistentpokemon999999",
+            "GetPokemonAbilitiesRequest, fakepokemon"
+    })
+    @DisplayName("Should handle not found with SERVER SOAP fault")
+    void testNotFoundErrors(String requestType, String pokemonName) {
+        // Given - SOAP request with non-existent Pokemon
+        String soapRequest = String.format("""
+                <%s xmlns="http://bankaya.com/pokemon/soap">
+                    <name>%s</name>
+                </%s>
+                """, requestType, pokemonName, requestType);
+
+        // When & Then - Send request and expect a SERVER SOAP fault
         mockClient
                 .sendRequest(RequestCreators.withPayload(new StringSource(soapRequest)))
                 .andExpect(ResponseMatchers.serverOrReceiverFault());
@@ -171,6 +193,7 @@ class PokemonEndpointIntegrationTest {
         mockClient
                 .sendRequest(RequestCreators.withPayload(new StringSource(soapRequest)))
                 .andExpect(ResponseMatchers.noFault())
-                .andExpect(ResponseMatchers.xpath("count(//ns:abilities)", NAMESPACE_MAP).evaluatesTo(2));
+                .andExpect(ResponseMatchers.xpath("count(//ns:abilities)", NAMESPACE_MAP)
+                        .evaluatesTo(2));
     }
 }
