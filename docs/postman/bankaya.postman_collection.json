@@ -66,40 +66,6 @@
 		},
 		{
 			"name": "GetPokemonAbilities",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"  const pokemonNames = [\r",
-							"      \"pikachu\", \"charizard\", \"bulbasaur\", \"squirtle\", \"mewtwo\",\r",
-							"      \"eevee\", \"snorlax\", \"jigglypuff\", \"gengar\", \"dragonite\",\r",
-							"      \"gyarados\", \"alakazam\", \"machamp\", \"blastoise\", \"venusaur\",\r",
-							"      \"raichu\", \"arcanine\", \"ninetales\", \"meowth\", \"psyduck\",\r",
-							"      \"growlithe\", \"abra\", \"kadabra\", \"hitmonlee\", \"hitmonchan\",\r",
-							"      \"lapras\", \"ditto\", \"vaporeon\", \"jolteon\", \"flareon\"\r",
-							"  ];\r",
-							"\r",
-							"  const randomPokemon = pokemonNames[Math.floor(Math.random() * pokemonNames.length)];\r",
-							"  pm.collectionVariables.set(\"pokemonName\", randomPokemon);"
-						],
-						"type": "text/javascript",
-						"packages": {},
-						"requests": {}
-					}
-				}
-			],
 			"request": {
 				"method": "POST",
 				"header": [
