@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.github.bjornvester.xjc' version '1.8.2'
+    id 'org.sonarqube' version "7.0.0.6105"
 }
 
 group = 'com.bankaya'
@@ -82,5 +83,46 @@ bootJar {
 xjc {
     xsdDir = file("${projectDir}/src/main/resources/xsd")
     outputJavaDir = layout.buildDirectory.dir("generated-sources/jaxb")
+}
+
+// Sonar Configuration
+sonar {
+    properties {
+        property "sonar.projectName", "Pokemon SOAP Service"
+        property "sonar.projectKey", "pokemon-soap-service"
+        property "sonar.host.url", "http://localhost:9000"
+
+        def sonarToken = System.getenv("SONAR_TOKEN")
+
+        if (sonarToken) {
+            property "sonar.token", sonarToken
+            println "✅ SonarQube token configurado"
+        } else {
+            println "⚠️ ADVERTENCIA: No se encontró SONAR_TOKEN. El análisis puede fallar."
+        }
+
+        // Rutas del código fuente
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.binaries", "build/classes/java/main"
+        //property "sonar.java.test.binaries", "build/classes/java/test"
+
+        // Exclusiones
+        property "sonar.coverage.exclusions", [
+                "**/PokemonSoapServiceApplication.java",
+                "**/config/**",
+                "**/configuration/**",
+                "**/dtos/**",
+                "**/dto/**",
+                "**/entities/**",
+                "**/entity/**",
+                "**/enums/**",
+                "**/enum/**",
+                "**/*Exception.java",
+                "**/*Builder.java",
+                "**/generated/**",
+                "**/build/**"
+        ].join(",")
+    }
 }
 

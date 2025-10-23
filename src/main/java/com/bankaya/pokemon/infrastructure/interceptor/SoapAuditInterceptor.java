@@ -156,10 +156,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     private void extractSoapInfo(MessageContext messageContext, SoapAuditLog soapAuditLog, Object endpoint) {
-        if (messageContext.getRequest() instanceof SoapMessage soapRequest) {
-
-            // Obtener el método SOAP (local part del body)
-            if (soapRequest.getSoapBody() != null) {
+        if (messageContext.getRequest() instanceof SoapMessage soapRequest && soapRequest.getSoapBody() != null) {
                 Source bodySource = soapRequest.getSoapBody().getPayloadSource();
                 if (bodySource instanceof DOMSource domSource) {
                     Node rootNode = domSource.getNode();
@@ -168,7 +165,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
                     }
                 }
             }
-        }
+
 
         // Información del endpoint
         if (endpoint != null) {
