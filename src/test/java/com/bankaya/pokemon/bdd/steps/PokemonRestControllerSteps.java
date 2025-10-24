@@ -22,7 +22,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

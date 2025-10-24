@@ -160,16 +160,10 @@ public class SoapProxyControllerSteps {
     }
 
     @And("the response {string} should contain URL {string} into array {string}")
-    public void responseContainsUrl(String path, String url, String field) throws Exception {
+    public void responseContainsUrl(String url, String field) throws Exception {
         var response = scenarioContext.getLastResponse();
         String expression = String.format("$.%s[0].url", field);
         jsonPath(expression, is(url)).match(response);
-    }
-
-    @And("the response should contain location value {string}")
-    public void responseContainsLocationValue(String location) throws Exception {
-        var response = scenarioContext.getLastResponse();
-        jsonPath("$.location_area_encounters", is(location)).match(response);
     }
 
     @And("the response should contain name value {string}")

@@ -25,7 +25,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -91,16 +90,6 @@ public class PokemonEndpointSteps {
         sendSoapRequest("GetPokemonAbilitiesRequest", pokemonName);
     }
 
-    @When("I send a GetPokemonBaseExperienceRequest for {string}")
-    public void sendGetPokemonBaseExperienceRequest(String pokemonName) {
-        sendSoapRequest("GetPokemonBaseExperienceRequest", pokemonName);
-    }
-
-    @When("I send a GetPokemonHeldItemsRequest for {string}")
-    public void sendGetPokemonHeldItemsRequest(String pokemonName) {
-        sendSoapRequest("GetPokemonHeldItemsRequest", pokemonName);
-    }
-
     @When("I send a GetPokemonIdRequest for {string}")
     public void sendGetPokemonIdRequest(String pokemonName) {
         sendSoapRequest("GetPokemonIdRequest", pokemonName);
@@ -109,11 +98,6 @@ public class PokemonEndpointSteps {
     @When("I send a GetPokemonNameRequest for {string}")
     public void sendGetPokemonNameRequest(String pokemonName) {
         sendSoapRequest("GetPokemonNameRequest", pokemonName);
-    }
-
-    @When("I send a GetPokemonLocationAreaEncountersRequest for {string}")
-    public void sendGetPokemonLocationAreaEncountersRequest(String pokemonName) {
-        sendSoapRequest("GetPokemonLocationAreaEncountersRequest", pokemonName);
     }
 
     @When("I send a {string} with empty name")
@@ -125,11 +109,6 @@ public class PokemonEndpointSteps {
                 """, requestType, requestType);
         log.info("Sending {} with empty name", requestType);
         sendRawSoapRequest(soapRequest);
-    }
-
-    @When("I send a {string} for {string}")
-    public void sendRequestForPokemon(String requestType, String pokemonName) {
-        sendSoapRequest(requestType, pokemonName);
     }
 
     @When("I request the WSDL at {string}")
@@ -156,55 +135,11 @@ public class PokemonEndpointSteps {
         log.info("✓ No SOAP fault present");
     }
 
-    @Then("the response should contain a CLIENT SOAP fault")
-    public void responseContainsClientFault() {
-        assertTrue(hasSoapFault,
-                "Expected a CLIENT SOAP fault but no fault occurred. " +
-                        "Response: " + lastSoapResponseXml);
-        assertNotNull(faultCode, "Fault code should not be null");
-
-        boolean isClientFault = faultCode.toUpperCase().contains("CLIENT");
-
-        assertTrue(isClientFault,
-                String.format("Expected CLIENT fault but got: %s - %s", faultCode, faultString));
-        log.info("✓ CLIENT SOAP fault detected: {} - {}", faultCode, faultString);
-    }
-
-    @Then("the response should contain a SERVER SOAP fault")
-    public void responseContainsServerFault() {
-        assertTrue(hasSoapFault,
-                "Expected a SERVER SOAP fault but no fault occurred. " +
-                        "Response: " + lastSoapResponseXml);
-        assertNotNull(faultCode, "Fault code should not be null");
-
-        boolean isServerFault = faultCode.toUpperCase().contains("SERVER");
-
-        assertTrue(isServerFault,
-                String.format("Expected SERVER fault but got: %s - %s", faultCode, faultString));
-        log.info("✓ SERVER SOAP fault detected: {} - {}", faultCode, faultString);
-    }
-
     @Then("the response should contain abilities element")
     public void responseContainsAbilitiesElement() {
         assertFalse(hasSoapFault, "Request should succeed without SOAP fault");
         assertNull(lastException, "Request should succeed without errors");
         log.info("✓ Response contains abilities element");
-    }
-
-    @Then("the response should contain baseExperience with value {string}")
-    public void responseContainsBaseExperienceWithValue(String expectedValue) {
-        assertFalse(hasSoapFault, "Request should succeed without SOAP fault");
-        if (lastSoapResponseXml != null) {
-            assertThat("Response should contain baseExperience with value " + expectedValue,
-                    lastSoapResponseXml, containsString(expectedValue));
-        }
-        log.info("✓ Response contains baseExperience: {}", expectedValue);
-    }
-
-    @Then("the response should contain GetPokemonHeldItemsResponse element")
-    public void responseContainsHeldItemsElement() {
-        assertFalse(hasSoapFault, "Request should succeed without SOAP fault");
-        log.info("✓ Response contains GetPokemonHeldItemsResponse element");
     }
 
     @Then("the response should contain id with value {string}")
@@ -225,12 +160,6 @@ public class PokemonEndpointSteps {
                     lastSoapResponseXml, containsString("<name>" + expectedValue + "</name>"));
         }
         log.info("✓ Response contains name: {}", expectedValue);
-    }
-
-    @Then("the response should contain locationAreaEncounters element")
-    public void responseContainsLocationEncountersElement() {
-        assertFalse(hasSoapFault, "Request should succeed without SOAP fault");
-        log.info("✓ Response contains locationAreaEncounters element");
     }
 
     @Then("the response status code should be {int}")
