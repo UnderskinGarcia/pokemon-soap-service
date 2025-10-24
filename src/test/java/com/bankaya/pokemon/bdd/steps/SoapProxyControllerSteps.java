@@ -159,7 +159,7 @@ public class SoapProxyControllerSteps {
         jsonPath("$.id", is(id)).match(response);
     }
 
-    @And("the response {string} should contain URL {string} into array {string}")
+    @And("the response should contain URL {string} into array {string}")
     public void responseContainsUrl(String url, String field) throws Exception {
         var response = scenarioContext.getLastResponse();
         String expression = String.format("$.%s[0].url", field);
