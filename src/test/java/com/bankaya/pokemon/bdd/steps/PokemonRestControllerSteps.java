@@ -21,6 +21,7 @@ import com.bankaya.pokemon.soap.HeldItem;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.hamcrest.Matchers.is;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Step definitions for Pokemon REST Controller BDD tests
  */
-@Slf4j
+@Log4j2
 public class PokemonRestControllerSteps {
 
     @Autowired

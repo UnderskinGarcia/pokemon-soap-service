@@ -24,6 +24,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,7 +39,7 @@ import static org.springframework.ws.test.server.ResponseMatchers.noFault;
 /**
  * Step definitions for Pokemon SOAP Endpoint BDD tests
  */
-@Slf4j
+@Log4j2
 public class PokemonEndpointSteps {
 
     @Autowired
