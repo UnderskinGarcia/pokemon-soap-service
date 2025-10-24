@@ -6,6 +6,7 @@ import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 import com.bankaya.pokemon.application.service.PokemonService;
+import com.bankaya.pokemon.domain.exception.BadRequestException;
 import com.bankaya.pokemon.soap.GetPokemonAbilitiesResponse;
 import com.bankaya.pokemon.soap.GetPokemonBaseExperienceResponse;
 import com.bankaya.pokemon.soap.GetPokemonHeldItemsResponse;
