@@ -147,7 +147,7 @@ public class PokemonRestControllerSteps {
     }
 
     @And("the response should be in JSON format")
-    public void responseIsJsonFormat() throws Exception {
+    public void responseIsJsonFormat() {
         var response = scenarioContext.getLastResponse();
         String contentType = response.getResponse().getContentType();
         assertTrue(contentType != null && contentType.contains("application/json"),

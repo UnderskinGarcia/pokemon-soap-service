@@ -100,17 +100,6 @@ public class PokemonEndpointSteps {
         sendSoapRequest("GetPokemonNameRequest", pokemonName);
     }
 
-    @When("I send a {string} with empty name")
-    public void sendRequestWithEmptyName(String requestType) {
-        String soapRequest = String.format("""
-                <%s xmlns="http://bankaya.com/pokemon/soap">
-                    <name></name>
-                </%s>
-                """, requestType, requestType);
-        log.info("Sending {} with empty name", requestType);
-        sendRawSoapRequest(soapRequest);
-    }
-
     @When("I request the WSDL at {string}")
     public void requestWsdlAt(String path) {
         try {
