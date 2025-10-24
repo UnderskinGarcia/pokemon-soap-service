@@ -1,4 +1,4 @@
-Feature: Basic Cucumber Test
+Feature: Actuator Health Up Test
 
   Scenario: Verify MockMvc is available
     Given the REST API is available

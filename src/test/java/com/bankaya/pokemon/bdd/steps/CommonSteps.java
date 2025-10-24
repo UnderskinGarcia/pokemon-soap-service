@@ -2,7 +2,8 @@ package com.bankaya.pokemon.bdd.steps;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
+import com.bankaya.pokemon.bdd.context.ScenarioContext;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -13,12 +14,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Basic step definitions for simple Cucumber tests
  */
-public class BasicSteps {
+public class CommonSteps {
 
     @Autowired
     private MockMvc mockMvc;
 
-    private MvcResult lastResponse;
+    @Autowired
+    private ScenarioContext scenarioContext;
 
     @Given("the REST API is available")
     public void restApiIsAvailable() {
@@ -31,12 +33,18 @@ public class BasicSteps {
     @When("I call GET {string}")
     public void callGetEndpoint(String endpoint) throws Exception {
         System.out.println("Calling GET " + endpoint);
-        lastResponse = mockMvc.perform(get(endpoint)).andReturn();
-        System.out.println("Response status: " + lastResponse.getResponse().getStatus());
+        var result = mockMvc.perform(get(endpoint)).andReturn();
+        scenarioContext.setLastResponse(result);
+        System.out.println("Response status: " + result.getResponse().getStatus());
     }
 
     @Then("the response status should be {int}")
     public void responseStatusIs(int expectedStatus) {
+        var lastResponse = scenarioContext.getLastResponse();
+        if (lastResponse == null) {
+            throw new IllegalStateException("No response available. Did you call the endpoint first?");
+        }
+
         int actualStatus = lastResponse.getResponse().getStatus();
         if (actualStatus != expectedStatus) {
             throw new AssertionError(

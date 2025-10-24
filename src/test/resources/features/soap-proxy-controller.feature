@@ -52,7 +52,7 @@ Feature: SOAP Proxy Controller REST Endpoints
     Then the response status should be 404
 
   Scenario Outline: Handle different Pokemon names correctly
-    Given I have mocked Pokemon "<pokemonName>" with ID <expectedId>
+    Given I have mocked Pokemon "<pokemonName>" with expectedId <expectedId>
     When I call GET "/api/soap/pokemon/<pokemonName>/id"
     Then the response status should be 200
     And the response should contain id value <expectedId>

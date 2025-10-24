@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.bankaya.pokemon.application.service.PokemonService;
+import com.bankaya.pokemon.bdd.context.ScenarioContext;
 import com.bankaya.pokemon.domain.exception.PokemonNotFoundException;
 import com.bankaya.pokemon.soap.Ability;
 import com.bankaya.pokemon.soap.GetPokemonAbilitiesResponse;
@@ -20,7 +21,6 @@ import io.cucumber.java.en.Given;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
@@ -34,7 +34,8 @@ public class SoapProxyControllerSteps {
     @Autowired
     private PokemonService pokemonService;
 
-    private int lastStatusCode;
+    @Autowired
+    private ScenarioContext scenarioContext;
 
     @Given("the SOAP service is mocked")
     public void soapServiceIsMocked() {
@@ -54,7 +55,6 @@ public class SoapProxyControllerSteps {
             response.getAbilities().add(ability);
         }
 
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonAbilities(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
@@ -64,7 +64,6 @@ public class SoapProxyControllerSteps {
     public void mockPokemonWithBaseExperience(String pokemonName, int baseExp) {
         GetPokemonBaseExperienceResponse response = new GetPokemonBaseExperienceResponse();
         response.setBaseExperience(baseExp);
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonBaseExperienceResponse(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
@@ -78,8 +77,17 @@ public class SoapProxyControllerSteps {
         item.setUrl("https://pokeapi.co/api/v2/item/213/");
         response.getHeldItems().add(item);
 
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonHeldItems(
+                argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
+        )).thenReturn(response);
+    }
+
+    @Given("I have mocked Pokemon {string} with expectedId {int}")
+    public void iHaveMockedPokemonWithId(String pokemonName, int expectedId) {
+        GetPokemonIdResponse response = new GetPokemonIdResponse();
+        response.setId(expectedId);
+
+        when(pokemonService.getPokemonId(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
     }
@@ -89,7 +97,6 @@ public class SoapProxyControllerSteps {
         GetPokemonIdResponse response = new GetPokemonIdResponse();
         response.setId(id);
 
-        // Register mock with case-insensitive matching using argThat
         when(pokemonService.getPokemonId(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
@@ -99,7 +106,6 @@ public class SoapProxyControllerSteps {
     public void mockPokemonWithName(String pokemonName, String name) {
         GetPokemonNameResponse response = new GetPokemonNameResponse();
         response.setName(name);
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonName(
                 argThat(arg -> arg != null && arg.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
@@ -109,7 +115,6 @@ public class SoapProxyControllerSteps {
     public void mockPokemonWithLocation(String pokemonName, String location) {
         GetPokemonLocationAreaEncountersResponse response = new GetPokemonLocationAreaEncountersResponse();
         response.setLocationAreaEncounters(location);
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonLocationAreaEncounters(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
@@ -117,7 +122,6 @@ public class SoapProxyControllerSteps {
 
     @Given("the Pokemon {string} does not exist")
     public void pokemonDoesNotExist(String pokemonName) {
-        // Use case-insensitive matching for pokemon name
         when(pokemonService.getPokemonId(
                 argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenThrow(new PokemonNotFoundException(pokemonName));
@@ -128,58 +132,59 @@ public class SoapProxyControllerSteps {
         // Empty name will be handled by the endpoint
     }
 
+    // Todos los @And ahora usan el contexto compartido
     @And("the response should contain base_experience value {int}")
     public void responseContainsBaseExperience(int baseExp) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/base-experience"))
-                .andExpect(jsonPath("$.base_experience", is(baseExp)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.base_experience", is(baseExp)).match(response);
     }
 
     @And("the response should contain {int} abilities")
     public void responseContainsAbilities(int number) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/abilities"))
-                .andExpect(jsonPath("$.abilities.length()", is(number)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.abilities.length()", is(number)).match(response);
     }
 
     @And("the response should contain {int} held item")
     public void responseContainsHeldItems(int number) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/held-items"))
-                .andExpect(jsonPath("$.held_items.length()", is(number)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.held_items.length()", is(number)).match(response);
     }
 
     @And("the first ability should be {string}")
     public void firstAbilityShouldBe(String ability) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/abilities"))
-                .andExpect(jsonPath("$.abilities[0].name", is(ability)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.abilities[0].name", is(ability)).match(response);
     }
 
     @And("the first held item should be {string}")
     public void firstHeldItemShouldBe(String item) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/held-items"))
-                .andExpect(jsonPath("$.held_items[0].name", is(item)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.held_items[0].name", is(item)).match(response);
     }
 
     @And("the response should contain id value {int}")
     public void responseContainsIdValue(int id) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/id"))
-                .andExpect(jsonPath("$.id", is(id)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.id", is(id)).match(response);
     }
 
     @And("the response {string} should contain URL {string} into array {string}")
     public void responseContainsUrl(String path, String url, String field) throws Exception {
+        var response = scenarioContext.getLastResponse();
         String expression = String.format("$.%s[0].url", field);
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/" + path))
-                .andExpect(jsonPath(expression, is(url)));
+        jsonPath(expression, is(url)).match(response);
     }
 
     @And("the response should contain location value {string}")
     public void responseContainsLocationValue(String location) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/locations"))
-                .andExpect(jsonPath("$.location_area_encounters", is(location)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.location_area_encounters", is(location)).match(response);
     }
 
     @And("the response should contain name value {string}")
     public void responseContainsNameValue(String name) throws Exception {
-        mockMvc.perform(get("/api/soap/pokemon/pikachu/name"))
-                .andExpect(jsonPath("$.name", is(name)));
+        var response = scenarioContext.getLastResponse();
+        jsonPath("$.name", is(name)).match(response);
     }
 }
