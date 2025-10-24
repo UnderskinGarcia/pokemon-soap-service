@@ -50,6 +50,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.h2database:h2'
 
+
+    // Cucumber
+    testImplementation 'io.cucumber:cucumber-java:7.18.1'
+    testImplementation 'io.cucumber:cucumber-spring:7.18.1'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.18.1'
+    testImplementation 'org.junit.platform:junit-platform-suite'
+
     // JAXB para SOAP
     implementation 'com.sun.xml.bind:jaxb-impl:4.0.6'
     implementation 'wsdl4j:wsdl4j:1.6.3'

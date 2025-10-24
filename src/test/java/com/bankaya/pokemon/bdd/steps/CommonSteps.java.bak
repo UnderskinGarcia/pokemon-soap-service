@@ -1,0 +1,28 @@
+package com.bankaya.pokemon.bdd.steps;
+
+import org.springframework.test.web.servlet.MvcResult;
+
+/**
+ * Common helper methods for step definitions
+ * This class should NOT contain Cucumber annotations (@Given, @When, @Then, @And)
+ * Use composition to call these methods from actual step definition classes
+ */
+public class CommonSteps {
+
+    protected MvcResult lastResponse;
+    protected int lastStatusCode;
+
+    protected void assertStatusCodeIs(int expectedStatus) {
+        assert lastStatusCode == expectedStatus : "Status code should be " + expectedStatus + " but was " + lastStatusCode;
+    }
+
+    protected void assertResponseContains(String content) {
+        assert lastResponse != null : "Response should not be null";
+        try {
+            String body = lastResponse.getResponse().getContentAsString();
+            assert body.contains(content) : "Response should contain " + content;
+        } catch (Exception e) {
+            System.err.println("Error reading response body: " + e.getMessage());
+        }
+    }
+}
