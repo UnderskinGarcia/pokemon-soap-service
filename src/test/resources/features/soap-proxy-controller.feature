@@ -13,7 +13,7 @@ Feature: SOAP Proxy Controller REST Endpoints
     Then the response status should be 200
     And the response should contain 2 abilities
     And the first ability should be "static"
-    And the response "abilities" should contain URL "https://pokeapi.co/api/v2/ability/9/" into array "abilities"
+    And the response should contain URL "https://pokeapi.co/api/v2/ability/9/" into array "abilities"
 
   Scenario: Get Pokemon base experience through REST proxy
     Given I have mocked Pokemon "pikachu" with base experience 112
@@ -27,7 +27,7 @@ Feature: SOAP Proxy Controller REST Endpoints
     Then the response status should be 200
     And the response should contain 1 held item
     And the first held item should be "light-ball"
-    And the response "held-items" should contain URL "https://pokeapi.co/api/v2/item/213/" into array "held_items"
+    And the response should contain URL "https://pokeapi.co/api/v2/item/213/" into array "held_items"
 
   Scenario: Get Pokemon ID through REST proxy
     Given I have mocked Pokemon "pikachu" with ID 25
