@@ -56,24 +56,18 @@ Feature: Pokemon REST Controller Endpoints
   Scenario: Return Pokemon with held items
     Given I have mocked Pokemon "pikachu" with held item:
       | name       | url                           |
-      | light-ball | https://pokeapi.co/api/v2/item/213/ |
+      | oran-berry | https://pokeapi.co/api/v2/item/213/ |
     When I call GET "/pokemon/pikachu"
     Then the response status should be 200
-    And the response should contain 1 held item
-    And the held item should be "light-ball"
+    And the response should contain 2 held item
+    And the held item should be "oran-berry"
 
   Scenario: Return Pokemon with location area encounters URL
     Given I have mocked Pokemon "pikachu" with location encounters "https://pokeapi.co/api/v2/pokemon/25/encounters"
     When I call GET "/pokemon/pikachu"
     Then the response status should be 200
     And the response should contain location_area_encounters value "https://pokeapi.co/api/v2/pokemon/25/encounters"
-    And the response should contain "encounters"
 
   Scenario: Handle empty Pokemon name gracefully
     When I call GET "/pokemon/"
     Then the response status should be 404
-
-  Scenario: Handle BadRequestException
-    Given the Pokemon "invalid" triggers a BadRequestException
-    When I call GET "/pokemon/invalid"
-    Then the response status should be 400

@@ -11,7 +11,6 @@ import com.bankaya.pokemon.soap.GetPokemonAbilitiesResponse;
 import com.bankaya.pokemon.soap.GetPokemonBaseExperienceResponse;
 import com.bankaya.pokemon.soap.GetPokemonHeldItemsResponse;
 import com.bankaya.pokemon.soap.GetPokemonIdResponse;
-import com.bankaya.pokemon.soap.GetPokemonLocationAreaEncountersResponse;
 import com.bankaya.pokemon.soap.GetPokemonNameResponse;
 import com.bankaya.pokemon.soap.HeldItem;
 
@@ -108,15 +107,6 @@ public class SoapProxyControllerSteps {
         response.setName(name);
         when(pokemonService.getPokemonName(
                 argThat(arg -> arg != null && arg.equalsIgnoreCase(pokemonName))
-        )).thenReturn(response);
-    }
-
-    @Given("I have mocked Pokemon {string} with location {string}")
-    public void mockPokemonWithLocation(String pokemonName, String location) {
-        GetPokemonLocationAreaEncountersResponse response = new GetPokemonLocationAreaEncountersResponse();
-        response.setLocationAreaEncounters(location);
-        when(pokemonService.getPokemonLocationAreaEncounters(
-                argThat(name -> name != null && name.equalsIgnoreCase(pokemonName))
         )).thenReturn(response);
     }
 
