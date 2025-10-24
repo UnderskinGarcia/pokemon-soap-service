@@ -146,15 +146,6 @@ public class PokemonRestControllerSteps {
         log.info("✓ Mocked Pokemon {} with location encounters: {}", pokemonName, encountersUrl);
     }
 
-    @Given("the Pokemon {string} triggers a BadRequestException")
-    public void pokemonTriggersBadRequest(String pokemonName) {
-        // This would trigger a validation error - empty or invalid name
-        log.info("✓ Configured Pokemon {} to trigger BadRequestException", pokemonName);
-    }
-
-    // Note: "I call GET {string}" is inherited from CommonSteps
-    // Note: "the response status should be {int}" is inherited from CommonSteps
-
     @And("the response should be in JSON format")
     public void responseIsJsonFormat() throws Exception {
         var response = scenarioContext.getLastResponse();
