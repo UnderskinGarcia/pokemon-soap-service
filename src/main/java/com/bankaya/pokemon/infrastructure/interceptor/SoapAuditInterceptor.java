@@ -36,7 +36,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     private static final ThreadLocal<SoapAuditLog> soapAuditLog = new ThreadLocal<>();
 
     @Override
-    public boolean handleRequest(MessageContext messageContext, Object endpoint) throws Exception {
+    public boolean handleRequest(MessageContext messageContext, Object endpoint) {
         try {
             // Iniciar contexto de auditoría
             SoapAuditLog auditLog = SoapAuditLog.builder().build()
@@ -62,7 +62,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     @Override
-    public boolean handleResponse(MessageContext messageContext, Object endpoint) throws Exception {
+    public boolean handleResponse(MessageContext messageContext, Object endpoint) {
         try {
             SoapAuditLog auditLog = soapAuditLog.get();
             if (auditLog != null) {
@@ -78,7 +78,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     @Override
-    public boolean handleFault(MessageContext messageContext, Object endpoint) throws Exception {
+    public boolean handleFault(MessageContext messageContext, Object endpoint) {
         try {
             SoapAuditLog auditLog = soapAuditLog.get();
             if (auditLog != null) {
@@ -180,14 +180,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             message.writeTo(outputStream);
-            String payload = outputStream.toString(StandardCharsets.UTF_8);
-
-            // Limitar tamaño si es necesario
-            if (payload.length() > 10000) {
-                return payload.substring(0, 10000) + "... [TRUNCATED]";
-            }
-
-            return payload;
+            return outputStream.toString(StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Error extracting payload", e);
             return "Error extracting payload: " + e.getMessage();
