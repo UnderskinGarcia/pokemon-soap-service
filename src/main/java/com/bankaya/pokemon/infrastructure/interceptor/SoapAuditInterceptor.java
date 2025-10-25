@@ -180,14 +180,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             message.writeTo(outputStream);
-            String payload = outputStream.toString(StandardCharsets.UTF_8);
-
-            // Limitar tamaño si es necesario
-            if (payload.length() > 10000) {
-                return payload.substring(0, 10000) + "... [TRUNCATED]";
-            }
-
-            return payload;
+            return outputStream.toString(StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Error extracting payload", e);
             return "Error extracting payload: " + e.getMessage();
