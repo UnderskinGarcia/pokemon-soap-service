@@ -123,7 +123,7 @@ class SoapAuditInterceptorTest {
     }
 
     @Test
-    void handleRequest_withException_shouldReturnTrueAndLogError() throws Exception {
+    void handleRequest_withException_shouldReturnTrueAndLogError() {
         when(messageContext.getRequest()).thenThrow(new RuntimeException("Test exception"));
 
         boolean result = interceptor.handleRequest(messageContext, null);
@@ -149,7 +149,7 @@ class SoapAuditInterceptorTest {
     }
 
     @Test
-    void handleResponse_withException_shouldReturnTrueAndLogError() throws Exception {
+    void handleResponse_withException_shouldReturnTrueAndLogError() {
         when(messageContext.getResponse()).thenThrow(new RuntimeException("Test exception"));
 
         boolean result = interceptor.handleResponse(messageContext, null);
@@ -178,7 +178,7 @@ class SoapAuditInterceptorTest {
     }
 
     @Test
-    void handleFault_withException_shouldReturnTrueAndLogError() throws Exception {
+    void handleFault_withException_shouldReturnTrueAndLogError() {
         when(messageContext.getResponse()).thenThrow(new RuntimeException("Test exception"));
 
         boolean result = interceptor.handleFault(messageContext, null);
