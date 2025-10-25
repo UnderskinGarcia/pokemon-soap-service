@@ -177,7 +177,7 @@ def loadEnvFile() {
 def envVars = loadEnvFile()
 
 // Sonar Configuration
-sonar {add property sonar token, it can read it like env var or property from .env
+sonar {
     properties {
         property "sonar.projectName", "Pokemon SOAP Service"
         property "sonar.projectKey", "pokemon-soap-service"
