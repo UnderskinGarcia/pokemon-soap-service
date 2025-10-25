@@ -99,10 +99,10 @@ class PokeApiClientTest {
         assertEquals("pikachu", result.name());
         assertEquals(112, result.baseExperience());
         assertEquals(2, result.abilities().size());
-        assertEquals("static", result.abilities().get(0).name());
+        assertEquals("static", result.abilities().getFirst().name());
         assertEquals("lightning-rod", result.abilities().get(1).name());
         assertEquals(1, result.heldItems().size());
-        assertEquals("light-ball", result.heldItems().get(0).name());
+        assertEquals("light-ball", result.heldItems().getFirst().name());
         assertEquals("https://pokeapi.co/api/v2/pokemon/25/encounters", result.locationAreaEncounters());
 
         verify(webClient).get();
@@ -256,9 +256,9 @@ class PokeApiClientTest {
 
         assertNotNull(result);
         assertEquals(2, result.abilities().size());
-        assertEquals("overgrow", result.abilities().get(0).name());
-        assertFalse(result.abilities().get(0).isHidden());
-        assertEquals(1, result.abilities().get(0).slot());
+        assertEquals("overgrow", result.abilities().getFirst().name());
+        assertFalse(result.abilities().getFirst().isHidden());
+        assertEquals(1, result.abilities().getFirst().slot());
         assertEquals("chlorophyll", result.abilities().get(1).name());
         assertTrue(result.abilities().get(1).isHidden());
         assertEquals(3, result.abilities().get(1).slot());
