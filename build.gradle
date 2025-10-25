@@ -1,8 +1,10 @@
 plugins {
     id 'java'
+    id 'jacoco'
     id 'org.springframework.boot' version '3.5.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.github.bjornvester.xjc' version '1.8.2'
+    id 'org.sonarqube' version "7.0.0.6105"
 }
 
 group = 'com.bankaya'
@@ -49,6 +51,13 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testRuntimeOnly 'com.h2database:h2'
 
+
+    // Cucumber
+    testImplementation 'io.cucumber:cucumber-java:7.18.1'
+    testImplementation 'io.cucumber:cucumber-spring:7.18.1'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.18.1'
+    testImplementation 'org.junit.platform:junit-platform-suite'
+
     // JAXB para SOAP
     implementation 'com.sun.xml.bind:jaxb-impl:4.0.6'
     implementation 'wsdl4j:wsdl4j:1.6.3'
@@ -72,6 +81,63 @@ test {
             "-Xshare:off",  // Disable CDS to avoid warning with javaagent
             "-XX:+EnableDynamicAgentLoading"  // Suppress dynamic agent loading warning
     )
+    finalizedBy jacocoTestReport
+}
+
+// Tarea personalizada para ejecutar tests, coverage y análisis de SonarQube
+tasks.register('analyze') {
+    group = 'verification'
+    description = 'Ejecuta tests, genera reporte de cobertura JaCoCo y envía análisis a SonarQube'
+
+    dependsOn test
+    dependsOn jacocoTestReport
+    dependsOn tasks.named('sonar')
+
+    // Asegurar orden de ejecución
+    jacocoTestReport.mustRunAfter test
+    tasks.named('sonar').get().mustRunAfter jacocoTestReport
+
+    doLast {
+        println "✅ Tests ejecutados correctamente"
+        println "✅ Reporte JaCoCo generado en: build/reports/jacoco/test/html/index.html"
+        println "📊 Análisis de SonarQube completado"
+    }
+}
+
+// JaCoCo Configuration
+jacoco {
+    toolVersion = "0.8.14"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    // Exclusiones para JaCoCo (mismo patrón que SonarQube)
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/PokemonSoapServiceApplication.class',
+                    '**/config/**',
+                    '**/configuration/**',
+                    '**/dtos/**',
+                    '**/dto/**',
+                    '**/entities/**',
+                    '**/entity/**',
+                    '**/enums/**',
+                    '**/enum/**',
+                    '**/*Exception.class',
+                    '**/*Builder.class',
+                    '**/generated/**',
+                    '**/build/**',
+                    '**/com/bankaya/pokemon/generated/**'
+            ])
+        }))
+    }
 }
 
 bootJar {
@@ -82,5 +148,78 @@ bootJar {
 xjc {
     xsdDir = file("${projectDir}/src/main/resources/xsd")
     outputJavaDir = layout.buildDirectory.dir("generated-sources/jaxb")
+}
+
+// Load .env file and return as map
+def loadEnvFile() {
+    def envVars = [:]
+    def envFile = file("${projectDir}/.env")
+    if (envFile.exists()) {
+        envFile.readLines().each { line ->
+            def trimmedLine = line.trim()
+            if (trimmedLine && !trimmedLine.startsWith('#')) {
+                def parts = trimmedLine.split('=', 2)
+                if (parts.length == 2) {
+                    def key = parts[0].trim()
+                    def value = parts[1].trim()
+                    envVars[key] = value
+                }
+            }
+        }
+        println "✅ Archivo .env cargado correctamente"
+    } else {
+        println "⚠️ Archivo .env no encontrado"
+    }
+    return envVars
+}
+
+// Cargar variables del .env
+def envVars = loadEnvFile()
+
+// Sonar Configuration
+sonar {
+    properties {
+        property "sonar.projectName", "Pokemon SOAP Service"
+        property "sonar.projectKey", "pokemon-soap-service"
+        property "sonar.host.url", "http://localhost:9000"
+
+        // Intentar obtener el token del .env o de las variables de ambiente del sistema
+        def sonarToken = envVars['SONAR_TOKEN'] ?: System.getenv("SONAR_TOKEN")
+
+        if (sonarToken) {
+            property "sonar.token", sonarToken
+            // También establecer como propiedad del sistema para el scanner
+            System.setProperty("sonar.token", sonarToken as String)
+            println "✅ SonarQube token configurado desde " + (envVars['SONAR_TOKEN'] ? ".env" : "variables de ambiente")
+        } else {
+            println "❌ No se encontró SONAR_TOKEN en .env ni en variables de ambiente. El análisis puede fallar."
+        }
+
+        // Rutas del código fuente
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.java.binaries", "build/classes/java/main"
+        //property "sonar.java.test.binaries", "build/classes/java/test"
+
+        // Reportes de cobertura
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+
+        // Exclusiones
+        property "sonar.coverage.exclusions", [
+                "**/PokemonSoapServiceApplication.java",
+                "**/config/**",
+                "**/configuration/**",
+                "**/dtos/**",
+                "**/dto/**",
+                "**/entities/**",
+                "**/entity/**",
+                "**/enums/**",
+                "**/enum/**",
+                "**/*Exception.java",
+                "**/*Builder.java",
+                "**/generated/**",
+                "**/build/**"
+        ].join(",")
+    }
 }
 
