@@ -58,3 +58,4 @@ Thumbs.db
 ### Application Logs ###
 logs/
 *.log.*
+/target/
