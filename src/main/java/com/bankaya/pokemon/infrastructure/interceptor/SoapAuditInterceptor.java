@@ -36,7 +36,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     private static final ThreadLocal<SoapAuditLog> soapAuditLog = new ThreadLocal<>();
 
     @Override
-    public boolean handleRequest(MessageContext messageContext, Object endpoint) {
+    public boolean handleRequest(MessageContext messageContext, Object endpoint) throws Exception {
         try {
             // Iniciar contexto de auditoría
             SoapAuditLog auditLog = SoapAuditLog.builder().build()
@@ -62,7 +62,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     @Override
-    public boolean handleResponse(MessageContext messageContext, Object endpoint) {
+    public boolean handleResponse(MessageContext messageContext, Object endpoint) throws Exception {
         try {
             SoapAuditLog auditLog = soapAuditLog.get();
             if (auditLog != null) {
@@ -78,7 +78,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     @Override
-    public boolean handleFault(MessageContext messageContext, Object endpoint) {
+    public boolean handleFault(MessageContext messageContext, Object endpoint) throws Exception {
         try {
             SoapAuditLog auditLog = soapAuditLog.get();
             if (auditLog != null) {
@@ -156,7 +156,10 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
     }
 
     private void extractSoapInfo(MessageContext messageContext, SoapAuditLog soapAuditLog, Object endpoint) {
-        if (messageContext.getRequest() instanceof SoapMessage soapRequest && soapRequest.getSoapBody() != null) {
+        if (messageContext.getRequest() instanceof SoapMessage soapRequest) {
+
+            // Obtener el método SOAP (local part del body)
+            if (soapRequest.getSoapBody() != null) {
                 Source bodySource = soapRequest.getSoapBody().getPayloadSource();
                 if (bodySource instanceof DOMSource domSource) {
                     Node rootNode = domSource.getNode();
@@ -165,7 +168,7 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
                     }
                 }
             }
-
+        }
 
         // Información del endpoint
         if (endpoint != null) {
@@ -180,7 +183,14 @@ public class SoapAuditInterceptor implements EndpointInterceptor {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             message.writeTo(outputStream);
-            return outputStream.toString(StandardCharsets.UTF_8);
+            String payload = outputStream.toString(StandardCharsets.UTF_8);
+
+            // Limitar tamaño si es necesario
+            if (payload.length() > 10000) {
+                return payload.substring(0, 10000) + "... [TRUNCATED]";
+            }
+
+            return payload;
         } catch (Exception e) {
             log.error("Error extracting payload", e);
             return "Error extracting payload: " + e.getMessage();

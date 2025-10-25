@@ -44,7 +44,7 @@ public class PokeApiClient implements PokemonApiPort {
         try {
             PokemonApiResponse response = webClient
                     .get()
-                    .uri(pokeApiBaseUrl + "/pokemon/{name}", pokemonName.trim().toLowerCase())
+                    .uri(pokeApiBaseUrl + "/pokemon/{name}", pokemonName.toLowerCase())
                     .retrieve()
                     .onStatus(HttpStatus.NOT_FOUND::equals,
                             clientResponse -> Mono.error(new PokemonNotFoundException(pokemonName))
