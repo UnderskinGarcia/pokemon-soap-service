@@ -1,292 +1,99 @@
 # Pokemon SOAP Service
 
-SOAP Web Service para consumir la API de Pokemon (PokeAPI) utilizando arquitectura hexagonal. Este servicio actúa como un gateway entre clientes SOAP y la PokeAPI REST, transformando peticiones SOAP en consultas HTTP y devolviendo respuestas XML.
+A production-ready SOAP web service that acts as a gateway between SOAP clients and the PokeAPI REST API, built with hexagonal architecture and comprehensive testing (89.4% coverage).
 
-## Descripción
+## 📋 Introduction
 
-El servicio permite consultar información de Pokemon mediante 6 operaciones SOAP:
-- **GetPokemonAbilities** - Obtiene las habilidades de un Pokemon
-- **GetPokemonBaseExperience** - Consulta la experiencia base
-- **GetPokemonHeldItems** - Lista los objetos que puede portar
-- **GetPokemonId** - Obtiene el ID del Pokemon
-- **GetPokemonName** - Obtiene el nombre del Pokemon
-- **GetPokemonLocationAreaEncounters** - Consulta ubicaciones donde puede ser encontrado
+This service exposes 6 SOAP operations to query Pokemon information:
 
-**Arquitectura actual**: El servicio funciona como un **proxy/gateway** que:
-1. Recibe peticiones SOAP XML
-2. Consulta la PokeAPI REST (https://pokeapi.co/api/v2)
-3. Transforma la respuesta JSON a objetos de dominio
-4. Devuelve respuestas SOAP XML al cliente
+- **GetPokemonAbilities** - Retrieve Pokemon abilities
+- **GetPokemonBaseExperience** - Query base experience points
+- **GetPokemonHeldItems** - List held items
+- **GetPokemonId** - Get Pokemon ID
+- **GetPokemonName** - Get Pokemon name
+- **GetPokemonLocationAreaEncounters** - Query location encounters
 
-## Stack Tecnológico
+**Flow**: SOAP Request (XML) → Service → PokeAPI (REST) → Transform → SOAP Response (XML)
 
-### Core
-- **Java 21** - Lenguaje de programación
-- **Spring Boot 3.5.6** - Framework principal
-- **Gradle 8.x** - Herramienta de construcción (con Gradle Wrapper)
-- **Spring Dependency Management 1.1.7** - Gestión de versiones
+## 🛠️ Technologies
 
-### Web Services (SOAP)
-- **Spring Web Services (Spring-WS)** - Framework SOAP
-- **JAXB 4.0.4** - Marshalling/Unmarshalling XML
-- **WSDL4J 1.6.3** - Generación automática de WSDL
-- **XJC Plugin 1.8.2** - Generación de clases Java desde XSD
+### Core Stack
+- **Java 21** - Programming language
+- **Spring Boot 3.5.6** - Application framework
+- **Gradle 8.x** - Build tool with wrapper
 
-### Cliente HTTP
-- **Spring WebFlux** - Cliente HTTP reactivo (WebClient)
-- **Project Reactor** - Programación reactiva
+### SOAP & XML
+- **Spring Web Services** - SOAP framework
+- **JAXB 4.0.4** - XML marshalling/unmarshalling
+- **WSDL4J 1.6.3** - WSDL auto-generation
+- **XJC Plugin 1.8.2** - Generate Java classes from XSD
 
-### Mapeo y Transformación
-- **MapStruct 1.5.5.Final** - Mapeo entre DTOs y modelos de dominio
-- **Lombok** - Reducción de código boilerplate
+### Data & Client
+- **Spring WebFlux** - Reactive HTTP client (WebClient)
+- **MapStruct 1.6.3** - DTO mapping
+- **Caffeine 3.1.8** - Caching layer
 
-### Logging
-- **Log4j2** - Sistema de logging (excluye Logback por defecto de Spring Boot)
-- Configuración con múltiples appenders (Application, Error, SOAP, Performance)
+### Persistence & Logging
+- **PostgreSQL 15** - Database
+- **Spring Data JPA** - Repository layer
+- **Log4j2** - Structured logging with multiple appenders
 
-### Monitoreo
-- **Spring Actuator** - Endpoint de health check
+### Testing & Quality
+- **JUnit 5** - Unit testing
+- **Mockito** - Mocking framework
+- **Cucumber 7.18.1** - BDD integration tests
+- **JaCoCo 0.8.14** - Code coverage (89.4%)
+- **SonarQube 7.0.0** - Code quality analysis
 
-### Base de Datos (Configurada pero NO implementada aún)
-- **Spring Data JPA** - Dependencia presente pero sin entidades ni repositorios
-- **PostgreSQL Driver** - Driver JDBC incluido pero sin uso actual
-- **HikariCP** - Pool de conexiones (incluido con Spring Boot)
-
-### Testing
-- **JUnit 5** - Framework de testing
-- **Spring Boot Test** - Utilidades de testing
-- **Reactor Test** - Testing reactivo
+### Documentation & Monitoring
+- **Springdoc OpenAPI 2.8.13** - Swagger UI
+- **Spring Actuator** - Health checks & metrics
 
 ### DevOps
-- **Docker** - Contenedorización
-- **Docker Compose** - Orquestación multi-contenedor
-- **Spring DevTools** - Recarga automática en desarrollo
+- **Docker & Docker Compose** - Containerization
+- **Spring DevTools** - Hot reload in development
 
-## Arquitectura
+## 🏗️ Architecture
 
-El proyecto sigue una **Arquitectura Hexagonal** (Ports & Adapters) que separa la lógica de negocio de los detalles de infraestructura:
+Hexagonal Architecture (Ports & Adapters) with clean separation of concerns:
 
 ```
 src/main/java/com/bankaya/pokemon/
-├── application/          # Capa de Aplicación
-│   └── service/         # Casos de uso y orquestación
-├── domain/              # Núcleo del Negocio
-│   ├── model/          # Entidades de dominio
-│   └── port/           # Interfaces (Puertos)
-│       ├── in/        # Puertos de entrada (use cases)
-│       └── out/       # Puertos de salida (repositorios, APIs)
-└── infrastructure/      # Capa de Infraestructura
-    ├── adapter/        # Implementaciones de adaptadores
-    │   ├── persistence/  # Adaptador de BD (JPA/PostgreSQL)
-    │   ├── rest/        # Adaptador REST (Cliente PokeAPI)
-    │   └── soap/        # Adaptador SOAP (Endpoints)
-    └── config/          # Configuraciones de Spring
+├── application/          # Application Layer
+│   └── service/         # Use cases & orchestration
+├── domain/              # Domain Layer (Business Logic)
+│   ├── model/          # Domain entities (Java Records)
+│   └── ports/          # Interfaces
+│       ├── in/        # Input ports (use cases)
+│       └── out/       # Output ports (repositories, APIs)
+└── infrastructure/      # Infrastructure Layer
+    ├── adapter/
+    │   ├── persistence/  # JPA/PostgreSQL adapter
+    │   ├── rest/        # PokeAPI REST client
+    │   └── soap/        # SOAP endpoints
+    ├── config/          # Spring configurations
+    └── interceptor/     # SOAP audit interceptor
 ```
 
-### Flujo de Datos (Implementación Actual)
+**Key Principles:**
+- ✅ Dependency Inversion (Domain doesn't depend on infrastructure)
+- ✅ Single Responsibility (Each layer has one purpose)
+- ✅ Ports & Adapters (Interfaces decouple logic from implementation)
 
-```
-Cliente SOAP (XML Request)
-    ↓
-PokemonEndpoint.java (infrastructure/adapter/soap)
-    - Recibe petición SOAP
-    - Deserializa XML mediante JAXB
-    - Extrae el nombre del Pokemon
-    ↓
-PokemonService.java (application/service)
-    - Implementa GetPokemonUseCase (domain/port/in)
-    - Valida parámetros
-    - Delega a PokemonApiPort
-    ↓
-PokeApiClient.java (infrastructure/adapter/rest)
-    - Implementa PokemonApiPort (domain/port/out)
-    - Construye URL: https://pokeapi.co/api/v2/pokemon/{name}
-    - Ejecuta petición HTTP GET con WebClient
-    - Maneja errores (404 → PokemonNotFoundException)
-    ↓
-PokeAPI Externa (JSON Response)
-    ↓
-PokemonMapper.java (MapStruct)
-    - Transforma PokemonApiResponse → Pokemon (domain model)
-    - Mapea habilidades, items, ubicaciones
-    ↓
-Pokemon (domain/model)
-    - Modelo de dominio inmutable (Java Record)
-    - Contiene: id, name, baseExperience, abilities, heldItems, locationAreaEncounters
-    ↓
-PokemonService.java
-    - Convierte Pokemon → SOAP Response DTO específico
-    - Retorna objeto de respuesta SOAP
-    ↓
-PokemonEndpoint.java
-    - Serializa respuesta a XML mediante JAXB
-    ↓
-Cliente SOAP (XML Response)
-```
+## 📝 Examples
 
-**Nota importante**:
-- ✅ Cada petición consulta directamente la PokeAPI
-- ✅ El patrón hexagonal permite agregar persistencia fácilmente en el futuro
+### SOAP Request Example
 
-### Principios Aplicados
+**Endpoint**: `http://localhost:8080/pokemon/ws`
+**WSDL**: `http://localhost:8080/pokemon/ws/pokemon.wsdl`
 
-- **Separación de Responsabilidades**: Cada capa tiene un propósito específico
-- **Inversión de Dependencias**: El dominio no depende de infraestructura
-- **Ports & Adapters**: Interfaces desacoplan lógica de implementación
-- **Single Responsibility**: Cada clase tiene una única razón para cambiar
-
-## Requisitos Previos
-
-- **Java 21** o superior ([Descargar OpenJDK](https://adoptium.net/))
-- **Docker** y **Docker Compose** ([Instalar Docker](https://docs.docker.com/get-docker/))
-- **Gradle** (incluido wrapper - no requiere instalación)
-
-## Configuración Inicial
-
-### 1. Clonar el Repositorio
-
-```bash
-git clone https://github.com/UnderskinGarcia/pokemon-soap-service.git
-cd pokemon-soap-service
-```
-
-### 2. Configurar Variables de Entorno
-
-Copia el archivo de ejemplo y ajusta según tu entorno:
-
-```bash
-cp .env.example .env
-```
-
-Variables disponibles en `.env`:
-
-```properties
-# Docker compose
-DOCKER_POSTGRES_PORTS=5432:5432
-DOCKER_APP_PORTS=8080:8080
-
-# PostgreSQL Configuration
-POSTGRES_DB=pokemondb
-POSTGRES_HOST=postgres                    # 'postgres' para Docker, 'localhost' para local
-POSTGRES_PORT=5432                   # Puerto de PostgreSQL
-POSTGRES_USER=pokemon
-POSTGRES_PASSWORD=change_this_password    # Cambiar en producción
-
-# Application
-SPRING_PROFILES_ACTIVE=default            # Perfil de Spring (default, dev, prod)
-```
-
-## Instrucciones de Ejecución
-
-### Opción 1: Con Docker Compose (Recomendado)
-
-Esta es la forma más sencilla de ejecutar el proyecto completo (aplicación + base de datos):
-
-```bash
-# Construir e iniciar todos los servicios
-docker-compose up -d
-
-# Ver logs de la aplicación
-docker-compose logs -f pokemon-service
-
-# Ver logs de PostgreSQL
-docker-compose logs -f postgres
-
-# Verificar el estado de los servicios
-docker-compose ps
-
-# Detener los servicios
-docker-compose down
-
-# Detener y eliminar volúmenes (limpieza completa)
-docker-compose down -v
-```
-
-La aplicación estará disponible en:
-- **SOAP Endpoint**: http://localhost:8080/pokemon/ws
-- **WSDL**: http://localhost:8080/pokemon/ws/pokemon.wsdl
-- **Health Check**: http://localhost:8080/actuator/health
-
-### Opción 2: Ejecución Local (Sin Docker)
-
-Si prefieres ejecutar la aplicación localmente sin contenedores:
-
-#### 2.1. Configurar Variables de Entorno
-
-> **Nota**: Aunque PostgreSQL está configurado, **no es necesario tenerlo corriendo** ya que la aplicación actualmente no lo usa. Solo requiere las variables de entorno definidas.
-
-#### 2.2. Configurar Variables de Entorno para la Aplicación
-
-En Windows (PowerShell):
-```powershell
-$env:POSTGRES_HOST="localhost"
-$env:POSTGRES_PORT="5432"
-$env:POSTGRES_DB="pokemondb"
-$env:POSTGRES_USER="pokemon"
-$env:POSTGRES_PASSWORD="change_this_password"
-$env:SPRING_PROFILES_ACTIVE="dev"
-```
-
-En Linux/Mac:
-```bash
-export POSTGRES_HOST=localhost
-export POSTGRES_PORT=5432
-export POSTGRES_DB=pokemondb
-export POSTGRES_USER=pokemon
-export POSTGRES_PASSWORD=change_this_password
-export SPRING_PROFILES_ACTIVE=dev
-```
-
-#### 2.3. Ejecutar la Aplicación
-
-```bash
-# Otorgar permisos de ejecución al wrapper (Linux/Mac)
-chmod +x gradlew
-
-# Ejecutar la aplicación
-./gradlew bootRun
-
-# En Windows
-gradlew.bat bootRun
-```
-
-### Opción 3: Ejecutar JAR Compilado
-
-```bash
-# Compilar el proyecto
-./gradlew build
-
-# Ejecutar el JAR generado
-java -jar build/libs/pokemon-soap-service-0.0.1-SNAPSHOT.jar
-```
-
-## Uso del Servicio SOAP
-
-### Endpoints Disponibles
-
-El servicio expone 6 operaciones SOAP (namespace: `http://bankaya.com/pokemon/soap`):
-
-| Operación | Request | Response | Descripción |
-|-----------|---------|----------|-------------|
-| **GetPokemonAbilities** | `PokemonNameRequest` | `GetPokemonAbilitiesResponse` | Lista de habilidades del Pokemon |
-| **GetPokemonBaseExperience** | `PokemonNameRequest` | `GetPokemonBaseExperienceResponse` | Experiencia base (int) |
-| **GetPokemonHeldItems** | `PokemonNameRequest` | `GetPokemonHeldItemsResponse` | Objetos que puede portar |
-| **GetPokemonId** | `PokemonNameRequest` | `GetPokemonIdResponse` | ID numérico del Pokemon |
-| **GetPokemonName** | `PokemonNameRequest` | `GetPokemonNameResponse` | Nombre del Pokemon |
-| **GetPokemonLocationAreaEncounters** | `PokemonNameRequest` | `GetPokemonLocationAreaEncountersResponse` | Ubicaciones de encuentro |
-
-### Ejemplo de Petición SOAP
-
-Endpoint: `http://localhost:8080/pokemon/ws`
-
-Usando **curl**:
+Using **curl**:
 
 ```bash
 curl -X POST http://localhost:8080/pokemon/ws \
   -H "Content-Type: text/xml" \
   -d '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                         xmlns:soap="http://bankaya.com/pokemon/soap">
-   <soapenv:Header/>
    <soapenv:Body>
       <soap:GetPokemonAbilitiesRequest>
          <soap:name>pikachu</soap:name>
@@ -295,23 +102,7 @@ curl -X POST http://localhost:8080/pokemon/ws \
 </soapenv:Envelope>'
 ```
 
-Usando **Postman** o **SoapUI**:
-```xml
-POST http://localhost:8080/pokemon/ws
-Content-Type: text/xml
-
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-                  xmlns:soap="http://bankaya.com/pokemon/soap">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <soap:GetPokemonAbilitiesRequest>
-         <soap:name>pikachu</soap:name>
-      </soap:GetPokemonAbilitiesRequest>
-   </soapenv:Body>
-</soapenv:Envelope>
-```
-
-**Ejemplo de Respuesta**:
+**Response**:
 ```xml
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
    <SOAP-ENV:Body>
@@ -333,305 +124,309 @@ Content-Type: text/xml
 </SOAP-ENV:Envelope>
 ```
 
-### Acceder al WSDL
-
-El contrato WSDL se genera automáticamente desde `pokemon.xsd`:
-
-```
-http://localhost:8080/pokemon/ws/pokemon.wsdl
-```
-
-Puedes importar este WSDL en SoapUI, Postman o cualquier cliente SOAP para generar automáticamente las peticiones.
-
-### Endpoint REST (Testing)
-
-Adicionalmente, existe un endpoint REST para pruebas:
+### REST Endpoint (Testing)
 
 ```bash
-GET http://localhost:8080/pokemon/{name}
-
-# Ejemplo
+# Get complete Pokemon data as JSON
 curl http://localhost:8080/pokemon/pikachu
 ```
 
-Este endpoint devuelve el objeto completo de dominio en formato JSON.
+### Swagger UI
 
-## Desarrollo y Testing
+Interactive API documentation available at:
+```
+http://localhost:8080/swagger-ui.html
+```
 
-### Ejecutar Tests
+## 🚀 How to Run
+
+### Prerequisites
+
+- **Java 21+**
+- **Docker & Docker Compose**
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/UnderskinGarcia/pokemon-soap-service.git
+   cd pokemon-soap-service
+   ```
+
+2. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings (optional for Docker)
+   ```
+
+### Option 1: Docker
 
 ```bash
-# Ejecutar todos los tests
-./gradlew test
+# Start all services (app + postgres + sonarqube)
+docker-compose up -d
 
-# Ejecutar tests con reporte detallado
-./gradlew test --info
-
-# Ver reporte de tests en HTML
-# Abre: build/reports/tests/test/index.html
-```
-
-### Build del Proyecto
-
-```bash
-# Compilar sin ejecutar tests
-./gradlew build -x test
-
-# Compilar con tests
-./gradlew build
-
-# Limpiar y compilar
-./gradlew clean build
-```
-
-### Verificar Código
-
-```bash
-# Verificar compilación
-./gradlew check
-
-# Ver dependencias del proyecto
-./gradlew dependencies
-```
-
-## Estructura del Proyecto
-
-```
-pokemon-soap-service/
-├── docs/                           # Documentación del challenge
-├── src/
-│   ├── main/
-│   │   ├── java/com/bankaya/pokemon/
-│   │   │   ├── application/        # Capa de Aplicación
-│   │   │   │   └── service/       # Servicios y casos de uso
-│   │   │   ├── domain/            # Capa de Dominio
-│   │   │   │   ├── model/        # Entidades de dominio
-│   │   │   │   └── port/         # Interfaces (puertos)
-│   │   │   │       ├── in/       # Puertos de entrada
-│   │   │   │       └── out/      # Puertos de salida
-│   │   │   └── infrastructure/    # Capa de Infraestructura
-│   │   │       ├── adapter/
-│   │   │       │   ├── persistence/  # JPA + PostgreSQL
-│   │   │       │   ├── rest/        # Cliente PokeAPI
-│   │   │       │   └── soap/        # Endpoints SOAP
-│   │   │       └── config/          # Configuraciones Spring
-│   │   └── resources/
-│   │       ├── xsd/                # Esquemas XSD para SOAP
-│   │       │   └── pokemon.xsd    # Definición del contrato
-│   │       ├── application.properties
-│   │       ├── application-dev.properties
-│   │       └── log4j2.properties  # Configuración de logging
-│   └── test/                       # Tests unitarios e integración
-├── build/                          # Archivos generados por Gradle
-│   └── generated-sources/jaxb/    # Clases Java generadas desde XSD
-├── .env                            # Variables de entorno (no en git)
-├── .env.example                    # Plantilla de variables
-├── docker-compose.yml              # Orquestación Docker
-├── Dockerfile                      # Imagen Docker de la app
-├── build.gradle                    # Configuración Gradle
-├── gradlew / gradlew.bat          # Gradle Wrapper
-└── README.md                       # Documentación
-```
-
-## Configuración de Base de Datos
-
-> ⚠️ **IMPORTANTE**: La persistencia en PostgreSQL está **configurada pero NO implementada actualmente**.
-> La aplicación funciona como un proxy directo a la PokeAPI sin almacenar datos.
-
-### Estado Actual
-
-**Configurado**:
-- ✅ Dependencias JPA/Hibernate en `build.gradle`
-- ✅ Driver PostgreSQL incluido
-- ✅ Variables de entorno para conexión
-- ✅ PostgreSQL en `docker-compose.yml`
-
-**NO Implementado**:
-- ❌ Entidades JPA (`@Entity`)
-- ❌ Repositorios Spring Data
-- ❌ Lógica de persistencia
-- ❌ Transacciones
-
-### Parámetros de Conexión
-
-Si decides implementar persistencia, los parámetros configurados son:
-
-- **Host**: `localhost:5432` (local) / `postgres:5432` (Docker)
-- **Database**: `pokemondb`
-- **User**: `pokemon`
-- **Password**: `change_this_password` (configurable en `.env`)
-- **Driver**: `org.postgresql.Driver`
-- **URL**: `jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}`
-
-### Acceder a PostgreSQL (si está corriendo)
-
-```bash
-# Con Docker Compose
-docker-compose exec postgres psql -U pokemon -d pokemondb
-
-# Con Docker standalone
-docker exec -it pokemon-postgres psql -U pokemon -d pokemondb
-
-# Comandos útiles en psql:
-\l               # Listar bases de datos
-\dt              # Listar tablas (actualmente vacío)
-\q               # Salir
-```
-
-## Monitoreo y Logs
-
-### Health Check
-
-Verifica el estado de la aplicación:
-
-```bash
-curl http://localhost:8080/actuator/health
-```
-
-Respuesta esperada:
-```json
-{
-  "status": "UP",
-  "components": {
-    "diskSpace": {"status": "UP"},
-    "ping": {"status": "UP"}
-  }
-}
-```
-
-> **Nota**: El componente `db` aparecerá solo si PostgreSQL está corriendo y conectado. Actualmente la app no lo requiere.
-
-### Logs
-
-El sistema de logging está configurado con **Log4j2** (no Logback). Los logs se separan en múltiples archivos:
-
-**Archivos de Log** (en `logs/`):
-1. **application.log** - Logs generales de la aplicación (retención: 30 días)
-2. **error.log** - Solo errores (retención: 30 días)
-3. **soap.log** - Peticiones y respuestas SOAP (retención: 15 días)
-4. **database.log** - Logs de Hibernate/JPA si se usa (retención: 7 días)
-5. **performance.log** - Logs de WebClient/Reactor (retención: 15 días)
-
-**Ver logs en Docker**:
-```bash
-# Ver todos los logs
-docker-compose logs -f pokemon-service
-
-# Filtrar por nivel
-docker-compose logs pokemon-service | grep ERROR
-docker-compose logs pokemon-service | grep WARN
-docker-compose logs pokemon-service | grep "SOAP Request"
-```
-
-**Ver logs en local**:
-```bash
-# Logs en tiempo real
-tail -f logs/application.log
-
-# Solo errores
-tail -f logs/error.log
-
-# Peticiones SOAP
-tail -f logs/soap.log
-```
-
-**Niveles de log** (configurables en `log4j2.properties`):
-- **TRACE**: Información muy detallada
-- **DEBUG**: Información de debugging (usado para Spring WS)
-- **INFO**: Eventos informativos (nivel por defecto)
-- **WARN**: Advertencias (usado para Hibernate)
-- **ERROR**: Errores
-- **FATAL**: Errores críticos
-
-**Loggers configurados**:
-- `com.bankaya.pokemon`: INFO (código de la aplicación)
-- `org.springframework.ws`: DEBUG (Spring Web Services)
-- `org.springframework.web.reactive`: INFO (WebClient)
-- `org.hibernate`: WARN (JPA/Hibernate)
-- `com.zaxxer.hikari`: INFO (Pool de conexiones)
-
-## Troubleshooting
-
-### La aplicación no inicia
-
-```bash
-# Verificar que PostgreSQL esté corriendo
+# Check services status
 docker-compose ps
 
-# Ver logs de errores
-docker-compose logs pokemon-service
-
-# Verificar variables de entorno
-docker-compose config
-```
-
-### Puerto 8080 en uso
-
-Edita `.env` y cambia el puerto:
-```properties
-APP_PORT=9090:8080
-```
-
-Luego reinicia:
-```bash
+# Stop services
 docker-compose down
+
+# Clean shutdown (remove volumes)
+docker-compose down -v
+```
+
+**Services available:**
+- **SOAP Service**: http://localhost:8080/pokemon/ws
+- **WSDL**: http://localhost:8080/pokemon/ws/pokemon.wsdl
+- **Swagger**: http://localhost:8080/swagger-ui.html
+- **Health Check**: http://localhost:8080/actuator/health
+- **PostgreSQL**: localhost:5432
+- **SonarQube**: http://localhost:9000
+
+### Option 2: Local
+
+**Set environment variables** (Linux/Mac):
+```bash
+export POSTGRES_HOST=localhost
+export POSTGRES_PORT=5432
+export POSTGRES_DB=pokemondb
+export POSTGRES_USER=pokemon
+export POSTGRES_PASSWORD=change_this_password
+export SPRING_PROFILES_ACTIVE=dev
+```
+
+**Set environment variables** (Windows PowerShell):
+```powershell
+$env:POSTGRES_HOST="localhost"
+$env:POSTGRES_PORT="5432"
+$env:POSTGRES_DB="pokemondb"
+$env:POSTGRES_USER="pokemon"
+$env:POSTGRES_PASSWORD="change_this_password"
+$env:SPRING_PROFILES_ACTIVE="dev"
+```
+
+**Run the application**:
+```bash
+# Using Gradle wrapper
+./gradlew bootRun
+
+# Or build and run JAR
+./gradlew build
+java -jar build/libs/pokemon-soap-service-0.0.1-SNAPSHOT.jar
+```
+
+## 📊 Logs
+
+### Local Environment
+
+Log files are located in `logs/` directory:
+
+```bash
+# Application logs (general)
+tail -f logs/pokemon-service.log
+
+# Database operations
+tail -f logs/database.log
+
+# Performance metrics (WebClient, Reactor)
+tail -f logs/performance.log
+
+# SOAP requests/responses audit
+tail -f logs/soap-requests.log
+
+# Errors only
+tail -f logs/pokemon-service-error.log
+```
+
+### Docker Environment
+
+**View logs from containers**:
+
+```bash
+# Follow all service logs
+docker-compose logs -f pokemon-service
+
+# View specific log file inside container
+docker exec pokemon-service sh -c "cat /app/logs/pokemon-service.log"
+docker exec pokemon-service sh -c "cat /app/logs/database.log"
+docker exec pokemon-service sh -c "cat /app/logs/performance.log"
+docker exec pokemon-service sh -c "cat /app/logs/soap-requests.log"
+
+# Follow logs in real-time
+docker exec pokemon-service sh -c "tail -f /app/logs/database.log"
+docker exec pokemon-service sh -c "tail -f /app/logs/soap-requests.log"
+
+# Filter by log level
+docker-compose logs pokemon-service | grep ERROR
+docker-compose logs pokemon-service | grep WARN
+```
+
+**Log files retention**:
+- `pokemon-service.log`: 30 days
+- `database.log`: 7 days
+- `performance.log`: 15 days
+- `soap-requests.log`: 15 days
+
+## 🔍 SonarQube Analysis
+
+### How to Run
+
+**Option 1: Using custom Gradle task**
+```bash
+# Run tests + coverage + SonarQube analysis
+./gradlew clean analyze
+```
+
+**Option 2: Step by step**
+```bash
+# 1. Run tests and generate coverage report
+./gradlew clean test jacocoTestReport
+
+# 2. Send analysis to SonarQube
+./gradlew sonar
+```
+
+### View Results
+
+1. **SonarQube Dashboard**: http://localhost:9000
+   - Login: `admin` / `change_this_password`
+   - Project: `pokemon-soap-service`
+
+2. **Local JaCoCo Report**: `build/reports/jacoco/test/html/index.html`
+
+3. **Latest Metrics Screenshot**
+
+<p style="text-align: center;">
+  <img src="docs/sonar/sonar.png" alt="Sonar metrics image" style="width:1000px; height:auto;"/>
+</p>
+
+### Configuration
+
+The SonarQube token is configured in `.env` file (not committed to git):
+
+```properties
+SONAR_TOKEN=your_token_here
+```
+
+To generate a new token:
+1. Go to http://localhost:9000
+2. Login → My Account → Security → Generate Token
+3. Copy the token and update `.env`
+
+**Current Quality Metrics** (see `docs/sonar/sonar.png`):
+- ✅ **Coverage**: 89.4%
+- ✅ **Unit Tests**: All passing
+- ✅ **BDD Tests**: 4 Cucumber feature files
+- ✅ **Code Smells**: 0
+- ✅ **Technical Debt**: Low
+
+## 🧪 Testing
+
+```bash
+# Run all tests (unit + integration)
+./gradlew test
+
+# Run only unit tests
+./gradlew test --tests "*Test"
+
+# Run only Cucumber/BDD tests
+./gradlew test --tests "*CucumberRunnerTest"
+
+# Run with coverage report
+./gradlew test jacocoTestReport
+
+# View coverage report
+open build/reports/jacoco/test/html/index.html
+```
+
+**Test Structure**:
+- **Unit Tests** (89.4% coverage)
+  - `PokeApiClientTest` - REST client tests
+  - `SoapAuditInterceptorTest` - SOAP audit tests
+  - `SoapAuditServiceTest` - Async service tests
+
+- **BDD/Cucumber Tests** (4 feature files)
+  - `actuator.feature` - Health checks
+  - `pokemon-endpoint.feature` - SOAP operations
+  - `pokemon-rest-controller.feature` - REST endpoints
+  - `soap-proxy-controller.feature` - SOAP proxy
+
+## 📦 Build & Deploy
+
+```bash
+# Build without tests
+./gradlew build -x test
+
+# Build with tests
+./gradlew clean build
+
+# Create Docker image
+docker build -t pokemon-soap-service:latest .
+
+# Deploy with Docker Compose
 docker-compose up -d
 ```
 
-### Problemas con Gradle
+## 🔧 Troubleshooting
 
+**Port 8080 already in use**:
 ```bash
-# Limpiar cache de Gradle
+# Edit .env and change port mapping
+DOCKER_APP_PORTS=9090:8080
+# Restart: docker-compose down && docker-compose up -d
+```
+
+**PostgreSQL connection issues**:
+```bash
+# Check database is running
+docker-compose ps postgres
+
+# Connect to database
+docker-compose exec postgres psql -U pokemon -d pokemondb
+```
+
+**Gradle issues**:
+```bash
+# Clean cache
 ./gradlew clean
 
-# Refrescar dependencias
+# Refresh dependencies
 ./gradlew build --refresh-dependencies
-
-# Verificar versión de Java
-java -version  # Debe ser Java 21+
 ```
 
-### Error al consumir PokeAPI
+## 📄 API Documentation
 
-```bash
-# Verificar conectividad
-curl https://pokeapi.co/api/v2/pokemon/pikachu
+| Endpoint | Type | Description |
+|----------|------|-------------|
+| `/pokemon/ws` | SOAP | Main SOAP endpoint (6 operations) |
+| `/pokemon/ws/pokemon.wsdl` | WSDL | Service contract |
+| `/pokemon/{name}` | REST | Get Pokemon data (JSON) |
+| `/swagger-ui.html` | Docs | Interactive API documentation |
+| `/actuator/health` | Health | Service health check |
 
-# Ver logs de la aplicación para detalles
-docker-compose logs -f pokemon-service | grep ERROR
+## 🏆 Quality Metrics
 
-# Verificar que el nombre del Pokemon es válido (debe estar en minúsculas)
-# Correcto: pikachu, charizard, mewtwo
-# Incorrecto: Pikachu, CHARIZARD
-```
+- **Test Coverage**: 89.4% (JaCoCo)
+- **Unit Tests**: All tests passing
+- **Integration Tests**: 4 BDD feature files (Cucumber)
+- **Code Quality**: Monitored with SonarQube
+- **Architecture**: Hexagonal (Ports & Adapters)
+- **Code Style**: MapStruct, Lombok, Java 21 Records
 
-## Estado del Proyecto
+## What can be improved?
 
-### ✅ Implementado
+ - Update the generic http code response (500) with codes more appropriate to the use case.
+ - Swagger rest proxy was the best solution I could come up with.
+ - Add more tests to cover 100% of the code.
 
-- **Arquitectura Hexagonal completa** con separación clara de capas
-- **6 operaciones SOAP** funcionales con generación WSDL automática
-- **Cliente REST** a PokeAPI con manejo de errores
-- **Mapeo automático** con MapStruct entre DTOs y modelos de dominio
-- **Sistema de logging** multi-archivo con Log4j2
-- **Manejo de excepciones** a nivel de dominio
-- **Endpoint REST** para testing/validación
-- **Health check** con Actuator
-- **Contenerización** con Docker y Docker Compose
-- **Modelo de dominio** inmutable usando Java Records
-
-## Licencia
-
-Este proyecto es parte del challenge técnico de Bankaya.
-
-## Contacto
+## 📞 Contact
 
 - **GitHub**: [UnderskinGarcia](https://github.com/UnderskinGarcia)
-- **Repositorio**: [pokemon-soap-service](https://github.com/UnderskinGarcia/pokemon-soap-service)
+- **Repository**: [pokemon-soap-service](https://github.com/UnderskinGarcia/pokemon-soap-service)
 
 ---
 
-**Versión**: 0.0.1-SNAPSHOT
-**Última actualización**: 2025
+**Version**: 0.0.1-SNAPSHOT
 **Java**: 21
 **Spring Boot**: 3.5.6
+**Last Updated**: 2025
